@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghar Kharcha</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#6200EE" />
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+
+</head>
+<body>
+    <button id="a2hsBtn" class="a2hs-btn hidden">📲 Add to Home Screen</button>
+
+  <main>
+    <h1>Ghar Kharcha</h1>
+
+    <div class="input-area">
+      <button id="micBtn">🎤</button>
+      <input type="text" id="manualInput" placeholder="Type expense (e.g., 40 sabzi)">
+      <button id="addBtn">Add</button>
+    </div>
+
+    <ul id="expenseList"></ul>
+
+    <div class="total">
+      Total: ₹<span id="totalAmount">0</span>
+    </div>
+    <div id="voicePopup" class="hidden">
+        <div id="voiceText"></div>
+      </div>
+      
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
