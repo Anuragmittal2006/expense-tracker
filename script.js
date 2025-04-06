@@ -10,6 +10,10 @@ const voicePopup = document.getElementById('voicePopup');
 const voiceText = document.getElementById('voiceText');
 let isListening = false;
 let userStoppedMic = false;
+let userInteracted = false;
+window.addEventListener('click', () => userInteracted = true, { once: true });
+window.addEventListener('keydown', () => userInteracted = true, { once: true });
+
 // IndexedDB setup
 const request = indexedDB.open('ExpenseDB', 1);
 request.onupgradeneeded = e => {
@@ -115,7 +119,8 @@ function addExpense(amount, item) {
   req.onsuccess = function(e) {
     entry.id = e.target.result; // Set the auto-generated ID
     renderEntry(entry);
-  };
+    if (userInteracted && navigator.vibrate) navigator.vibrate(100);
+};
 }
 
 // Render list item + update total, with delete button
