@@ -19,6 +19,8 @@ const request = indexedDB.open('ExpenseDB', 1);
 request.onupgradeneeded = e => {
   db = e.target.result;
   db.createObjectStore('expenses', { keyPath: 'id', autoIncrement: true });
+  if (!db.objectStoreNames.contains('history'))
+    db.createObjectStore('history', { keyPath: 'month' });
 };
 request.onsuccess = e => {
   db = e.target.result;
@@ -204,3 +206,56 @@ a2hsBtn.onclick = async () => {
   }
   deferredPrompt = null;
 };
+// Archive current month & reset list
+document.getElementById('settleBtn').onclick = () => {
+  const confirmSettle = confirm('Clear current list and archive it?');
+  if (!confirmSettle) return;
+
+  const tx = db.transaction('expenses', 'readwrite');
+  const store = tx.objectStore('expenses');
+  const getReq = store.getAll();
+  
+  getReq.onsuccess = () => {
+    const entries = getReq.result;
+    if (!entries.length) return;
+
+    const monthKey = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const total = entries.reduce((sum, e) => sum + e.amount, 0);
+
+    const historyTx = db.transaction('history', 'readwrite');
+    const historyStore = historyTx.objectStore('history');
+    historyStore.put({ month: monthKey, total, entries });
+
+    // Clear current
+    entries.forEach(e => store.delete(e.id));
+
+    document.getElementById('expenseList').innerHTML = '';
+    document.getElementById('totalAmount').textContent = '0';
+    alert('✅ Archived successfully!');
+  };
+};
+
+// Load history
+function loadHistory() {
+  const tab = document.getElementById('historyTab');
+  const tx = db.transaction('history', 'readonly');
+  const store = tx.objectStore('history');
+  const req = store.getAll();
+
+  req.onsuccess = () => {
+    req.result.forEach(({ month, total, entries }) => {
+      const section = document.createElement('section');
+      section.innerHTML = `<h3>${month} — ₹${total.toFixed(2)}</h3>`;
+      const ul = document.createElement('ul');
+      entries.forEach(e => {
+        const li = document.createElement('li');
+        li.textContent = `[₹${e.amount}] – ${e.item}`;
+        ul.appendChild(li);
+      });
+      section.appendChild(ul);
+      tab.appendChild(section);
+    });
+  };
+}
+
+window.loadHistory = loadHistory;
