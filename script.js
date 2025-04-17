@@ -70,6 +70,17 @@ recognition.onresult = e => {
   } else {
     voiceText.textContent = "Couldn't understand 😕";
   }
+   if (transcript === "बस") {
+    recognition.stop();
+    voicePopup.classList.add('hidden');
+
+    alert("Voice recognition बंद कर दी गई।");
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // double tap feel
+
+    // Optional: App ko 'close' jaisa feel dena
+    window.location.href = "about:blank"; // ya kisi aur blank page pe bhej do
+    return;
+  }
   // Hide popup after 2.5 sec
   setTimeout(() => {
     voicePopup.classList.add('hidden');
